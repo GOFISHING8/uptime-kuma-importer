@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uptime Kuma 批量管理工具</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Uptime Kuma 批量管理工具</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('import')">批量导入</button>
+            <button class="tab-btn" onclick="showTab('delete')">批量删除</button>
+            <button class="tab-btn" onclick="showTab('filter-delete')">条件删除</button>
+        </div>
+        
+        <!-- 批量导入标签页 -->
+        <div id="import-tab" class="tab-content active">
+            <div class="config-section">
+                <div class="form-group">
+                    <label for="kuma_url">Uptime Kuma 地址:</label>
+                    <input type="text" id="kuma_url" placeholder="http://localhost:3001" value="http://localhost:3001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">用户名:</label>
+                    <input type="text" id="username" placeholder="请输入用户名">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">密码:</label>
+                    <input type="password" id="password" placeholder="请输入密码">
+                </div>
+                
+                <div class="form-group">
+                    <label for="csv_file">选择CSV文件:</label>
+                    <input type="file" id="csv_file" accept=".csv">
+                    <small>支持UTF-8和GBK编码，包含name, url, type, sysname, appname, hostinfo等字段</small>
+                </div>
+                
+                <button onclick="uploadFile()" id="uploadBtn">上传并预览</button>
+            </div>
+            
+            <div id="previewSection" class="preview-section">
+                <h3>数据预览 (前10行)</h3>
+                <div id="previewTable"></div>
+                <p>总共 <span id="totalRows">0</span> 行数据</p>
+                <button onclick="startImport()" id="importBtn">开始导入</button>
+            </div>
+        </div>
+        
+        <!-- 批量删除标签页 -->
+        <div id="delete-tab" class="tab-content">
+            <div class="config-section">
+                <div class="form-group">
+                    <label for="delete_kuma_url">Uptime Kuma 地址:</label>
+                    <input type="text" id="delete_kuma_url" placeholder="http://localhost:3001" value="http://localhost:3001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="delete_username">用户名:</label>
+                    <input type="text" id="delete_username" placeholder="请输入用户名">
+                </div>
+                
+                <div class="form-group">
+                    <label for="delete_password">密码:</label>
+                    <input type="password" id="delete_password" placeholder="请输入密码">
+                </div>
+                
+                <button onclick="loadMonitors()" id="loadBtn">加载监控项</button>
+            </div>
+            
+            <div id="monitorsList" class="monitors-section">
+                <h3>监控项列表 <span id="monitorsCount">(0)</span></h3>
+                <div class="list-actions">
+                    <button onclick="selectAll()">全选</button>
+                    <button onclick="selectNone()">全不选</button>
+                    <button onclick="selectInvert()">反选</button>
+                    <button onclick="deleteSelected()" class="danger" id="deleteSelectedBtn">删除选中项</button>
+                </div>
+                <div id="monitorsTable"></div>
+            </div>
+        </div>
+        
+        <!-- 条件删除标签页 -->
+        <div id="filter-delete-tab" class="tab-content">
+            <div class="config-section">
+                <div class="form-group">
+                    <label for="filter_kuma_url">Uptime Kuma 地址:</label>
+                    <input type="text" id="filter_kuma_url" placeholder="http://localhost:3001" value="http://localhost:3001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="filter_username">用户名:</label>
+                    <input type="text" id="filter_username" placeholder="请输入用户名">
+                </div>
+                
+                <div class="form-group">
+                    <label for="filter_password">密码:</label>
+                    <input type="password" id="filter_password" placeholder="请输入密码">
+                </div>
+                
+                <h3>筛选条件</h3>
+                
+                <div class="form-group">
+                    <label>名称筛选:</label>
+                    <select id="name_filter">
+                        <option value="">不筛选</option>
+                        <option value="contains">包含</option>
+                        <option value="starts_with">开头为</option>
+                        <option value="ends_with">结尾为</option>
+                    </select>
+                    <input type="text" id="name_keyword" placeholder="关键词">
+                </div>
+                
+                <div class="form-group">
+                    <label>类型筛选:</label>
+                    <select id="type_filter">
+                        <option value="all">所有类型</option>
+                        <option value="http">HTTP</option>
+                        <option value="ping">Ping</option>
+                        <option value="port">Port</option>
+                        <option value="dns">DNS</option>
+                    </select>
+                </div>
+                
+                <button onclick="deleteByFilter()" class="danger" id="filterDeleteBtn">执行删除</button>
+            </div>
+        </div>
+        
+        <div id="progress" class="progress">
+            <h3>正在处理中...</h3>
+            <p>请耐心等待，不要关闭页面</p>
+        </div>
+        
+        <div id="results" class="results"></div>
+
+	<div class="copyright">
+		<p>&copy; 2025 GOFISHING. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

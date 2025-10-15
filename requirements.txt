@@ -1,0 +1,4 @@
+Flask
+pandas
+uptime-kuma-api
+Werkzeug
